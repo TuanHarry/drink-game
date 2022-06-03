@@ -1,0 +1,16 @@
+[
+  {
+    "name": "luckyWheel",
+    "path": "/luckyWheel",
+    "component": "/Users/tuantran/Documents/SourceWeb/drink-game/pages/luckyWheel.vue",
+    "chunkName": "pages/luckyWheel",
+    "_name": "_195ca47b"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "/Users/tuantran/Documents/SourceWeb/drink-game/pages/index.vue",
+    "chunkName": "pages/index",
+    "_name": "_248ff34c"
+  }
+]
