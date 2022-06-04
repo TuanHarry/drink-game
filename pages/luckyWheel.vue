@@ -24,6 +24,7 @@ export default {
 			active: null,
 			btnSpin: null,
 			spinWheel: null,
+			// tween: null,
 			gifts: [
 				{
 					id: 1,
@@ -89,27 +90,15 @@ export default {
 			this.spinWheel = this.$gsap.timeline();
 		},
 
-		controlWheel(rotation) {
-			var currentRotation,
-				lastRotation = 0,
-				tolerance;
-			console.debug("controlWheel", this.spinWheel);
-			this.spinWheel.to(this.wheel, 2, {
-				rotation: rotation,
+		initTween(rotation) {
+			this.tween = null;
+			this.tween = this.$gsap.core.Tween.to(this.wheel, 5, {
+				rotation: rotation + "_cw",
 				transformOrigin: "50% 50%",
 				ease: "Power4.easeOut",
-				onUpdate: () => {
-					console.debug("data", this);
-					tolerance = currentRotation - lastRotation;
-					if (Math.round(currentRotation) % (360 / 12) <= tolerance) {
-						if (indicator.progress() > 0.2 || indicator.progress() === 0) {
-							indicator.play(0);
-						}
-					}
-					lastRotation = currentRotation;
-				},
+				repeatRefresh: true,
+				paused: true,
 			});
-			this.spinWheel.add("end");
 		},
 	},
 
@@ -117,24 +106,60 @@ export default {
 		this.$nextTick(() => {
 			this.initWheel();
 			//
+			var tween;
+			var oldRotation = 0;
+			var rotation = 0;
+
+			console.debug("renew tween");
+
 			this.btnSpin.addEventListener("click", () => {
 				const giftIdx = Math.floor(Math.random() * 9);
 				const gift = this.gifts[giftIdx];
 				console.debug("gift", giftIdx, gift);
 				const mediumRotation = (gift.range[0] + gift.range[1]) / 2;
+
 				console.debug("mediumRotation", mediumRotation);
 				console.debug("click to ", gift.amount);
-				var rotation = 4 * 360 + (360 - mediumRotation + 32);
-				this.$gsap.core.Tween.to(this.wheel, 5, {
-					rotation: rotation + "_cw",
-					transformOrigin: "50% 50%",
-					ease: "Power4.easeOut",
-					repeatRefresh: true,
-					onComplete: () => {
-						console.debug("completed", rotation);
-						rotation = 0;
-					},
-				});
+				rotation = 4 * 360 + 360 - mediumRotation + 32;
+				// var test = this.$gsap.core.Tween.to(this.wheel, 5, {
+				// 	rotation: rotation + "_cw",
+				// 	transformOrigin: "50% 50%",
+				// 	ease: "Power4.easeOut",
+				// 	onComplete: () => {
+				// 		// test.set(this.wheel, {
+				// 		// 	rotation: 122,
+				// 		// });
+				// 	},
+				// });
+
+				if (tween) {
+					oldRotation = 360 - mediumRotation + 32;
+					rotation = 360 - mediumRotation + 32 + (360 - oldRotation);
+					console.debug("run vao day", rotation, tween);
+					// tween.to(this.wheel, 5, {
+					// 	rotation: rotation + "_cw",
+					// 	transformOrigin: "50% 50%",
+					// 	ease: "Power4.easeOut",
+					// 	repeatRefresh: true,
+					// });
+					// tween.updateTo({
+					// 	rotation: rotation,
+					// });
+
+					console.debug("tween", tween.vars);
+					tween.set(this.wheel, { rotation });
+					console.debug("tween", tween.vars);
+					tween.restart();
+				} else {
+					rotation = 360 - mediumRotation + 32;
+					console.debug("renew tween", rotation);
+					tween = this.$gsap.core.Tween.to(this.wheel, 5, {
+						rotation: rotation + "_cw",
+						transformOrigin: "50% 50%",
+						ease: "Power4.easeOut",
+						repeatRefresh: true,
+					});
+				}
 			});
 		});
 	},
